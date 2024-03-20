@@ -5,12 +5,18 @@ import { sleep } from '../../helpers/sleep';
 
 export const useIssue = (issueNumber: Number) => {
   const getIssue = async (issueNumber: Number): Promise<Issue> => {
-    sleep(2);
-    const { data } = await githubApi.get(`/issues/${issueNumber}`);
+   await sleep(2); // Simulate a slow network
+    const { data } = await githubApi.get<Issue>(`/issues/${issueNumber}`);
     return data;
   };
+  const getIssueComments = async (issueNumber: Number): Promise<Issue[]> => {
+    await sleep(2); // Simulate a slow network
+     const { data } = await githubApi.get<Issue[]>(`/issues/${issueNumber}/comments`);
+     return data;
+   };
 
   const issueQUery = useQuery({ queryKey: ['issue'], queryFn: () => getIssue(issueNumber) });
+  const commentsQUery = useQuery({ queryKey: ['issue','comments'], queryFn: () => getIssueComments(issueQUery?.data!.number), enabled:!! issueQUery.data });
 
-  return {issueQUery};
+  return {issueQUery,commentsQUery};
 };
